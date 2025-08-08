@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, Play, CheckCircle, Users, Brain, Target, Star, MessageCircle, ArrowRight } from 'lucide-react';
+import { ChevronRight, CheckCircle, Users, Brain, Target, Star, MessageCircle, ArrowRight } from 'lucide-react';
 
 export default function AIInterviewLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -78,7 +78,6 @@ export default function AIInterviewLanding() {
               <div className="ml-10 flex items-baseline space-x-8">
                 <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">Features</a>
                 <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">How it Works</a>
-                <a href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">Contact</a>
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
@@ -98,7 +97,6 @@ export default function AIInterviewLanding() {
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
                 <a href="#features" className="block px-3 py-2 text-gray-600 hover:text-blue-600">Features</a>
                 <a href="#how-it-works" className="block px-3 py-2 text-gray-600 hover:text-blue-600">How it Works</a>
-                <a href="#contact" className="block px-3 py-2 text-gray-600 hover:text-blue-600">Contact</a>
                 <div className="flex flex-col space-y-2 px-3 py-2">
                   <a href="/login" className="text-left text-gray-600 hover:text-blue-600">Login</a>
                   <a href="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full text-center">Sign Up</a>
@@ -121,16 +119,6 @@ export default function AIInterviewLanding() {
               Get personalized mock interviews, instant feedback, and confidence-building practice 
               sessions tailored to your industry and role.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <a href="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 flex items-center group">
-                Start Free Trial
-                <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <button className="flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-200">
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
-              </button>
-            </div>
           </div>
           <div className="mt-16 relative">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl mx-auto border border-gray-100">
@@ -220,9 +208,6 @@ export default function AIInterviewLanding() {
             Join thousands of professionals who have improved their interview skills with InterviewAI
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a href="/signup" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105">
-              Start Free Trial
-            </a>
             <a href="/login" className="text-white border border-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200">
               Login
             </a>
@@ -231,9 +216,9 @@ export default function AIInterviewLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12" id="contact">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center mb-4">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -258,13 +243,6 @@ export default function AIInterviewLanding() {
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
               </ul>
@@ -276,5 +254,5 @@ export default function AIInterviewLanding() {
         </div>
       </footer>
     </div>
-  );
+  ); 
 }

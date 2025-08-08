@@ -6,7 +6,9 @@ import authRoutes from './routes/auth.route.js';
 import interviewRoutes from './routes/interview.routes.js';
 import geminiRoutes from './routes/gemini.routes.js';
 import cors from "cors";
-
+import path from 'path';
+import fs from 'fs';
+import resumeRoutes from './routes/resume.route.js';
 
 
 dotenv.config(); 
@@ -35,6 +37,13 @@ app.use(cors({
 app.use("/auth/api", authRoutes); 
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/mockinterview', geminiRoutes);
+
+// Ensure uploads/resumes directory exists
+const uploadsDir = path.join(path.resolve(), 'backend', 'uploads', 'resumes');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/api/resumes', resumeRoutes);
 
 
 app.listen(PORT, ()=>{ 

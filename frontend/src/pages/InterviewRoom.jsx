@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from 'axios'; 
+import IntervierPhoto from '../assets/Interviewer.jpeg';
 
 // SVG Components for better organization
 const SVGs = {
@@ -28,6 +29,16 @@ const SVGs = {
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
     </svg>
+  ),
+  X: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  ),
+  MicOff: ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 5.586A2 2 0 017 5h4a2 2 0 012 2v6M8 21h8m-4 0v-5m-7-7l18 18" />
+    </svg>
   )
 };
 
@@ -51,7 +62,7 @@ const InterviewerProfile = ({ botSpeaking }) => (
       <div className="relative">
         <div className={`w-40 h-40 rounded-full border-4 overflow-hidden ${botSpeaking ? 'border-blue-400' : 'border-gray-200'}`}>
           <img 
-            src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
+            src={IntervierPhoto}
             alt="Interviewer" 
             className="w-full h-full object-cover"
           />
@@ -65,7 +76,7 @@ const InterviewerProfile = ({ botSpeaking }) => (
     </div>
     
     <div className="text-center">
-      <h2 className="text-2xl font-bold text-gray-800">Sarah Johnson</h2>
+      <h2 className="text-2xl font-bold text-gray-800">Varun Mohan</h2>
       <p className="text-blue-500 font-medium">Senior Interviewer</p>
     </div>
 
@@ -182,7 +193,10 @@ const ChatInput = ({ onSend }) => {
 
 const SpeechInput = ({ onSend }) => {
   const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef(null);
+  const isListeningRef = useRef(false);
 
   useEffect(() => {
     if (!('webkitSpeechRecognition' in window)) {
@@ -191,58 +205,171 @@ const SpeechInput = ({ onSend }) => {
     }
     
     recognitionRef.current = new window.webkitSpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.interimResults = false;
-    recognitionRef.current.lang = 'en-US';
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+    recognitionRef.current.lang = 'en-IN';
     
     recognitionRef.current.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      onSend(transcript);
+      let finalTranscript = '';
+      let interimText = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcriptPart = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcriptPart;
+        } else {
+          interimText += transcriptPart;
+        }
+      }
+      
+      if (finalTranscript) {
+        setTranscript(prev => prev + finalTranscript);
+      }
+      setInterimTranscript(interimText);
     };
     
     recognitionRef.current.onerror = (event) => {
       console.error('Speech recognition error', event.error);
+      if (event.error === 'no-speech' || event.error === 'audio-capture') {
+        // Don't stop listening for these errors, just continue
+        return;
+      }
       setListening(false);
+      isListeningRef.current = false;
     };
     
     recognitionRef.current.onend = () => {
-      if (listening) {
-        recognitionRef.current.start();
-      } else {
-        setListening(false);
+      if (isListeningRef.current) {
+        // Restart recognition if we're still supposed to be listening
+        try {
+          recognitionRef.current.start();
+        } catch (error) {
+          console.error('Error restarting recognition:', error);
+          setListening(false);
+          isListeningRef.current = false;
+        }
       }
     };
     
     return () => {
       if (recognitionRef.current) {
+        isListeningRef.current = false;
         recognitionRef.current.stop();
       }
     };
-  }, [onSend]);
+  }, []);
 
-  const toggleListening = () => {
-    if (listening) {
-      recognitionRef.current.stop();
-      setListening(false);
-    } else {
-      recognitionRef.current.start();
+  const startListening = () => {
+    if (recognitionRef.current && !listening) {
       setListening(true);
+      isListeningRef.current = true;
+      setTranscript('');
+      setInterimTranscript('');
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        setListening(false);
+        isListeningRef.current = false;
+      }
     }
   };
 
+  const stopListening = () => {
+    if (recognitionRef.current && listening) {
+      setListening(false);
+      isListeningRef.current = false;
+      recognitionRef.current.stop();
+      setInterimTranscript('');
+    }
+  };
+
+  const resetSpeechInput = () => {
+    // Stop listening if currently listening
+    if (listening) {
+      setListening(false);
+      isListeningRef.current = false;
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    }
+    // Clear all transcripts
+    setTranscript('');
+    setInterimTranscript('');
+  };
+
+  const clearTranscript = () => {
+    resetSpeechInput();
+  };
+
+  const submitTranscript = () => {
+    if (transcript.trim()) {
+      onSend(transcript.trim());
+      resetSpeechInput(); // Reset after submitting
+    }
+  };
+
+  const displayText = transcript + interimTranscript;
+
   return (
-    <button
-      onClick={toggleListening}
-      className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border transition-all ${
-        listening
-          ? 'bg-red-500 border-red-500 text-white hover:bg-red-600'
-          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-      }`}
-    >
-      <div className={`w-4 h-4 rounded-full ${listening ? 'bg-white animate-pulse' : 'bg-red-500'}`} />
-      <span>{listening ? 'Listening...' : 'Speak Your Answer'}</span>
-      <SVGs.Mic className="h-5 w-5" />
-    </button>
+    <div className="space-y-3">
+      {/* Speech text display */}
+      <div className="min-h-[80px] p-4 border border-gray-300 rounded-xl bg-gray-50">
+        {displayText ? (
+          <div className="text-gray-800">
+            <span className="text-gray-900">{transcript}</span>
+            <span className="text-gray-500 italic">{interimTranscript}</span>
+          </div>
+        ) : (
+          <div className="text-gray-500 italic">
+            {listening ? 'Listening... speak now' : 'Click "Start Listening" to begin'}
+          </div>
+        )}
+      </div>
+
+      {/* Control buttons */}
+      <div className="flex space-x-3">
+        {/* Start/Stop listening button */}
+        <button
+          onClick={listening ? stopListening : startListening}
+          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border transition-all ${
+            listening
+              ? 'bg-red-500 border-red-500 text-white hover:bg-red-600'
+              : 'bg-green-500 border-green-500 text-white hover:bg-green-600'
+          }`}
+        >
+          <div className={`w-4 h-4 rounded-full ${listening ? 'bg-white animate-pulse' : 'bg-white'}`} />
+          <span>{listening ? 'Stop Listening' : 'Start Listening'}</span>
+          {listening ? <SVGs.MicOff className="h-5 w-5" /> : <SVGs.Mic className="h-5 w-5" />}
+        </button>
+
+        {/* Clear button */}
+        <button
+          onClick={clearTranscript}
+          disabled={!displayText && !listening}
+          className={`p-3 rounded-xl border transition-all ${
+            (displayText || listening)
+              ? 'bg-gray-500 border-gray-500 text-white hover:bg-gray-600'
+              : 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <SVGs.X className="h-5 w-5" />
+        </button>
+
+        {/* Submit button */}
+        <button
+          onClick={submitTranscript}
+          disabled={!transcript.trim()}
+          className={`p-3 rounded-xl border transition-all ${
+            transcript.trim()
+              ? 'bg-blue-500 border-blue-500 text-white hover:bg-blue-600'
+              : 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <SVGs.Check className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
   );
 };
 

@@ -4,11 +4,15 @@ import AddModal from '../components/AddModal';
 import InterviewCard from '../components/InterviewCard';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import ResumeUpload from '../components/ResumeUpload';
+import ResumeManager from '../components/ResumeManager';
 
 export default function Dashboard() {
   const [list, setList] = useState([]);
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [resumeModalOpen, setResumeModalOpen] = useState(false);
+  const [resumeManagerOpen, setResumeManagerOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const dropdownRef = useRef(null);
@@ -39,6 +43,7 @@ export default function Dashboard() {
   }, [dropdownOpen]);
 
   const onSaved = (doc) => setList([doc, ...list]);
+  const handleDeleted = (id) => setList(list => list.filter(i => i._id !== id));
 
   const handleLogout = async () => {
     await logout();
@@ -52,6 +57,18 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Interview Dashboard</h1>
           <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setResumeManagerOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700"
+            >
+              My Resumes
+            </button>
+            <button
+              onClick={() => setResumeModalOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Upload Resume
+            </button>
             <button
               onClick={() => navigate('/scores')}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -132,7 +149,7 @@ export default function Dashboard() {
 
           {list.length > 0 ? (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map(i => <InterviewCard key={i._id} data={i} />)}
+              {list.map(i => <InterviewCard key={i._id} data={i} onDeleted={handleDeleted} />)}
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
@@ -159,6 +176,8 @@ export default function Dashboard() {
 
       {/* Modal */}
       {open && <AddModal close={() => setOpen(false)} onSaved={onSaved} />}
+      <ResumeUpload open={resumeModalOpen} onClose={() => setResumeModalOpen(false)} />
+      <ResumeManager open={resumeManagerOpen} onClose={() => setResumeManagerOpen(false)} />
     </div>
   );
 }

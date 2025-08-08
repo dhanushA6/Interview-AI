@@ -9,7 +9,7 @@ const MessageSchema = new Schema({
 });
 
 const InterviewSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // 👈 Add this
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
   description: String,
   experienceYears: { type: Number, required: true },
@@ -18,6 +18,7 @@ const InterviewSchema = new Schema({
   finished: { type: Boolean, default: false },
   feedback: String,
   points: { type: Number, min: 0, max: 10 },
+  resume: { type: Schema.Types.ObjectId, ref: 'Resume', required: false }, // Optional resume reference
 });
 
 const Interview = model('Interview', InterviewSchema);

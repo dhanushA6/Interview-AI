@@ -1,10 +1,12 @@
 import Interview from '../models/interview.models.js';
+import Resume from '../models/resume.model.js';
+import { generateQuestionsFromResume } from '../services/gemini.js';
 
 // POST /api/interviews
 export const createInterview = async (req, res) => { 
   console.log(req.userId);
   try { 
-    const { title, description, experienceYears } = req.body;
+    const { title, description, experienceYears, resumeId } = req.body;
 
     // ✅ Ensure experienceYears is a number
     const years = Number(experienceYears);
@@ -12,11 +14,21 @@ export const createInterview = async (req, res) => {
       return res.status(400).json({ error: 'Invalid experienceYears value' });
     }
 
+    let questions = [];
+    if (resumeId) {
+      const resume = await Resume.findById(resumeId);
+      if (resume && resume.parsedText) {
+        questions = await generateQuestionsFromResume(resume.parsedText);
+      }
+    }
+
     const doc = await Interview.create({
       title,
       description,
       experienceYears: years, // ✅ Now guaranteed to be a number
       user: req.userId,
+      resume: resumeId || null,
+      questions,
     });
 
     res.status(201).json(doc);
@@ -66,6 +78,17 @@ export const saveFeedback = async (req, res) => {
     res.sendStatus(204);
   } catch (e) {
     console.error('Error saving feedback:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
+export const deleteInterview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Interview.findOneAndDelete({ _id: id, user: req.userId });
+    if (!deleted) return res.status(404).json({ error: 'Interview not found' });
+    res.sendStatus(204);
+  } catch (e) {
     res.status(500).json({ error: e.message });
   }
 };
