@@ -1,18 +1,33 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv'; 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+// Load environment variables from .env file
 dotenv.config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = 'gemini-1.5-flash-latest';
+const MODEL = 'gemini-2.5-flash'; 
 
+if (!GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY not found in environment variables.");
+}
+
+// Initialize the Google Generative AI client
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 function formatAiMessage(text) {
   return { role: 'ai', content: text };
 }
 
-// Chat with Gemini using chat history
+/**
+ * Chat with Gemini AI using conversation history.
+ * Purpose: Sends user chat history to Gemini and receives AI response.
+ * Input:
+ *   - history: array of message objects, each with role and content
+ * Output:
+ *   - On success: returns { role: 'ai', content: 'AI response text' }
+ *   - On failure: returns fallback message { role: 'ai', content: 'Too many requests, limit exceeded' }
+ */
+
 export const chatWithGemini = async (history) => {
   try {
     const model = genAI.getGenerativeModel({ model: MODEL });
@@ -27,7 +42,16 @@ export const chatWithGemini = async (history) => {
   }
 };
 
-// Generate basic content from a prompt
+/**
+ * Generate simple content from a prompt using Gemini AI.
+ * Purpose: Get AI-generated text from a basic text prompt.
+ * Input:
+ *   - prompt: string (text prompt to generate content)
+ * Output:
+ *   - On success: { role: 'ai', content: 'Generated text' }
+ *   - On failure: { role: 'ai', content: 'Error generating content.' }
+ */
+
 export const generateSimpleContent = async (prompt) => {
   try {
     const model = genAI.getGenerativeModel({ model: MODEL });
@@ -40,7 +64,16 @@ export const generateSimpleContent = async (prompt) => {
   }
 };
 
-// Extract text from a resume file (PDF or DOCX) using SDK (no axios)
+/**
+ * Extract text from a resume file (PDF or DOCX) using Gemini SDK.
+ * Purpose: Parse resume content and return clean text.
+ * Input:
+ *   - base64Content: string (base64-encoded file content)
+ *   - ext: string (file extension, e.g., '.pdf' or '.docx')
+ * Output:
+ *   - On success: string (extracted resume text)
+ *   - On failure: empty string
+ */
 export async function parseResumeWithGemini(base64Content, ext) {
   const mimeType =
     ext === '.pdf'
@@ -76,7 +109,15 @@ export async function parseResumeWithGemini(base64Content, ext) {
   }
 }
 
-// Generate 5 technical interview questions from resume text using SDK
+/**
+ * Generate 5 technical interview questions from resume text.
+ * Purpose: Create relevant interview questions based on candidate's resume.
+ * Input:
+ *   - resumeText: string (text content of the resume)
+ * Output:
+ *   - On success: array of strings (interview questions)
+ *   - On failure: empty array
+ */
 export async function generateQuestionsFromResume(resumeText) {
   const prompt = `Given the following resume text, generate 5 technical interview questions relevant to the candidate's experience. Return the questions as a JSON array of strings.\n\nResume:\n${resumeText}`;
 

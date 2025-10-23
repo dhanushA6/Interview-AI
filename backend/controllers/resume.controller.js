@@ -3,7 +3,13 @@ import path from 'path';
 import fs from 'fs';
 import { parseResumeWithGemini } from '../services/gemini.js';
 
+
 // List all resumes for a user
+// Purpose: Retrieve all resumes uploaded by the logged-in user.
+// Input: req.userId (string) – ID of the logged-in user
+// Output:
+//   - 200: JSON array of resumes
+//   - 500: JSON with error message if fetching fails
 export const listResumes = async (req, res) => {
   try {
     const resumes = await Resume.find({ userId: req.userId });
@@ -14,6 +20,15 @@ export const listResumes = async (req, res) => {
 };
 
 // Upload a resume and parse with Gemini
+// Purpose: Upload a resume file, parse its content using Gemini AI, and save it in the database.
+// Input: 
+//   - req.file: file object uploaded via multipart/form-data
+//   - req.userId: string (ID of logged-in user)
+// Output:
+//   - 201: JSON object of saved resume including parsed text
+//   - 400: JSON with error if no file uploaded
+//   - 500: JSON with error if upload or parsing fails
+
 export const uploadResume = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -38,6 +53,15 @@ export const uploadResume = async (req, res) => {
 };
 
 // Delete a resume
+// Purpose: Delete a specific resume by ID for the logged-in user, including the file on disk.
+// Input:
+//   - req.params.id: string (ID of the resume)
+//   - req.userId: string (ID of logged-in user)
+// Output:
+//   - 204: No content if deletion successful
+//   - 404: JSON if resume not found
+//   - 500: JSON if deletion fails
+
 export const deleteResume = async (req, res) => {
   try {
     const { id } = req.params;
@@ -53,6 +77,15 @@ export const deleteResume = async (req, res) => {
 };
 
 // Download a resume
+// Purpose: Download a specific resume file for the logged-in user.
+// Input:
+//   - req.params.id: string (ID of the resume)
+//   - req.userId: string (ID of logged-in user)
+// Output:
+//   - File download if found
+//   - 404: JSON if resume or file not found
+//   - 500: JSON if download fails
+
 export const downloadResume = async (req, res) => {
   try {
     const { id } = req.params;
@@ -67,6 +100,17 @@ export const downloadResume = async (req, res) => {
 };
 
 // Rename a resume
+// Purpose: Update the original name of a specific resume for the logged-in user.
+// Input:
+//   - req.params.id: string (ID of the resume)
+//   - req.body.newName: string (new name for the resume)
+//   - req.userId: string (ID of logged-in user)
+// Output:
+//   - 200: JSON object of updated resume
+//   - 400: JSON if newName is missing
+//   - 404: JSON if resume not found
+//   - 500: JSON if renaming fails
+
 export const renameResume = async (req, res) => {
   try {
     const { id } = req.params;

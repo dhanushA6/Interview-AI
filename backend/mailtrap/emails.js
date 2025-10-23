@@ -5,6 +5,17 @@ import {
 } from "./emailTemplates.js";
 import { mailtrapClient, sender } from "./mailtrap.config.js";
 
+/**
+ * Send a verification email to a new user.
+ * Purpose: Sends an email containing a verification token for email verification.
+ * Input:
+ *   - email: string (recipient's email address)
+ *   - verificationToken: string (unique token/code for verification)
+ * Output:
+ *   - On success: Logs the email response to console.
+ *   - On failure: Throws an error with descriptive message.
+ */
+
 export const sendVerificationEmail = async (email, verificationToken) => {
 	const recipient = [{ email }];
 
@@ -27,6 +38,17 @@ export const sendVerificationEmail = async (email, verificationToken) => {
 
 
 
+/**
+ * Send a welcome email to a new user.
+ * Purpose: Greets the user after successful registration.
+ * Input:
+ *   - email: string (recipient's email address)
+ *   - name: string (recipient's name)
+ * Output:
+ *   - On success: Logs the email response to console.
+ *   - On failure: Throws an error with descriptive message.
+ */
+
 export const sendWelcomeEmail = async (email, name) => {
   try {
     const response = await mailtrapClient.send({
@@ -43,6 +65,18 @@ export const sendWelcomeEmail = async (email, name) => {
     throw new Error(`Error sending welcome email: ${error}`);
   }
 };
+
+
+/**
+ * Send a password reset email to a user.
+ * Purpose: Provides a reset link for users who request password reset.
+ * Input:
+ *   - email: string (recipient's email address)
+ *   - resetURL: string (link to reset password)
+ * Output:
+ *   - On success: Email sent (no console log here, optional).
+ *   - On failure: Throws an error with descriptive message.
+ */
 
 
 export const sendPasswordResetEmail = async (email, resetURL) => {
@@ -62,6 +96,16 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
 		throw new Error(`Error sending password reset email: ${error}`);
 	}
 };
+
+/**
+ * Send a confirmation email after successful password reset.
+ * Purpose: Notifies the user that their password has been reset successfully.
+ * Input:
+ *   - email: string (recipient's email address)
+ * Output:
+ *   - On success: Logs the email response to console.
+ *   - On failure: Throws an error with descriptive message.
+ */
 
 export const sendResetSuccessEmail = async (email) => {
 	const recipient = [{ email }];

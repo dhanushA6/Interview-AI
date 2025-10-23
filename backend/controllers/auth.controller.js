@@ -10,6 +10,11 @@ import {
 } from "../mailtrap/emails.js";
 import { User } from "../models/user.model.js";
 
+
+// signup(req, res)
+// Purpose: Register a new user, hash password, generate verification token, send verification email, and set JWT cookie
+// Input: req.body = { email, password, name }
+// Output: JSON { success, message, user (without password) }
 export const signup = async (req, res) => {
 	const { email, password, name } = req.body;
 
@@ -56,6 +61,11 @@ export const signup = async (req, res) => {
 	}
 };
 
+// verifyEmail(req, res)
+// Purpose: Verify user's email using a code, mark user as verified, and send welcome email
+// Input: req.body = { code } (verification code)
+// Output: JSON { success, message, user (without password) }
+
 export const verifyEmail = async (req, res) => {
 	const { code } = req.body;
 	try {
@@ -89,6 +99,11 @@ export const verifyEmail = async (req, res) => {
 	}
 };
 
+// login(req, res)
+// Purpose: Authenticate user, validate password, update last login, and set JWT cookie
+// Input: req.body = { email, password }
+// Output: JSON { success, message, user (without password) }
+
 export const login = async (req, res) => {
 	const { email, password } = req.body;
 	try {
@@ -120,10 +135,20 @@ export const login = async (req, res) => {
 	}
 };
 
+// logout(req, res)
+// Purpose: Log out the user by clearing the JWT cookie
+// Input: none (uses cookies from request)
+// Output: JSON { success, message }
+
 export const logout = async (req, res) => {
 	res.clearCookie("token");
 	res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+
+// forgotPassword(req, res)
+// Purpose: Generate a password reset token, save it to the user, and send reset email
+// Input: req.body = { email }
+// Output: JSON { success, message }
 
 export const forgotPassword = async (req, res) => {
 	const { email } = req.body;
@@ -152,6 +177,11 @@ export const forgotPassword = async (req, res) => {
 		res.status(400).json({ success: false, message: error.message });
 	}
 };
+
+// resetPassword(req, res)
+// Purpose: Reset user's password using token, hash new password, clear reset token, and send confirmation email
+// Input: req.params = { token }, req.body = { password }
+// Output: JSON { success, message }
 
 export const resetPassword = async (req, res) => {
 	try {
@@ -183,6 +213,11 @@ export const resetPassword = async (req, res) => {
 		res.status(400).json({ success: false, message: error.message });
 	}
 };
+
+// checkAuth(req, res)
+// Purpose: Check if the user is authenticated using userId from middleware and return user info
+// Input: req.userId (from auth middleware)
+// Output: JSON { success, user (without password) }
 
 export const checkAuth = async (req, res) => {
 	try {
