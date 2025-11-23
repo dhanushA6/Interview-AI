@@ -1,6 +1,6 @@
 import express from "express"; 
 import {connectDB} from './db/connectDB.js';
-import dotenv from "dotenv";  
+import dotenv from "dotenv";   
 import cookieParser from "cookie-parser";
 import authRoutes from './routes/auth.route.js'; 
 import interviewRoutes from './routes/interview.routes.js';
@@ -8,7 +8,9 @@ import geminiRoutes from './routes/gemini.routes.js';
 import cors from "cors";
 import path from 'path';
 import fs from 'fs';
-import resumeRoutes from './routes/resume.route.js';
+import resumeRoutes from './routes/resume.route.js'; 
+
+//
 
 
 dotenv.config(); 
