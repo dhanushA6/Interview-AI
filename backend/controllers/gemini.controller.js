@@ -10,11 +10,9 @@ async function getResumeContent(resumeId) {
     if (resume && resume.parsedText) return { content: resume.parsedText, hasResume: true };
   } catch (err) {
     console.warn('Error fetching resume:', err);
-  }
+  } 
   return { content: '', hasResume: false };
 }
-
-
 
 
 /** Strategy for creating system prompts based on resume presence */

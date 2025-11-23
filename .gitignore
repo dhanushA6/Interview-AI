@@ -2,8 +2,8 @@
 node_modules/
 **/node_modules/
 
-# Environment variables
+# Environment variable files
 .env
 .env.*
 **/.env
-**/.env.* 
+**/.env.*
